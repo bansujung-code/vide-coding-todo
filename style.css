@@ -568,6 +568,13 @@ body {
     position: relative;
 }
 
+.todo-item::before {
+    content: '';
+    width: 20px;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
 .todo-item:last-child {
     border-bottom: none;
 }
@@ -589,7 +596,7 @@ body {
 .todo-checkbox {
     width: 20px;
     height: 20px;
-    margin-right: 16px;
+    margin-right: 0;
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
@@ -597,8 +604,9 @@ body {
     border: 2px solid #6b7280;
     border-radius: 50%;
     background: transparent;
-    position: relative;
-    flex-shrink: 0;
+    position: absolute;
+    left: 16px;
+    top: 16px;
     transition: all 0.2s;
 }
 
@@ -678,6 +686,7 @@ body {
     background: transparent;
     padding: 0;
     border-radius: 0;
+    margin-right: 16px;
 }
 
 .todo-actions {
@@ -685,10 +694,15 @@ body {
     gap: 8px;
     opacity: 0;
     transition: opacity 0.2s;
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    pointer-events: none;
 }
 
 .todo-item:hover .todo-actions {
     opacity: 1;
+    pointer-events: auto;
 }
 
 .edit-btn, .delete-btn, .save-btn, .cancel-btn {
