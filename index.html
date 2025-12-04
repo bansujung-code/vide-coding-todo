@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todoist - 할일 관리</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 좌측 사이드바 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">Todoist</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-item active" data-view="today">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-text">오늘</span>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-header" id="navSectionHeader">
+                        <span class="section-title">프로젝트</span>
+                        <button class="add-folder-btn" id="addFolderBtn" title="폴더 추가" style="display: none;">
+                            <span>+</span>
+                        </button>
+                    </div>
+                    <div id="folderCreateInputWrapper" class="folder-create-input-wrapper" style="display: none;">
+                        <input 
+                            type="text" 
+                            id="folderCreateInput" 
+                            class="folder-create-input"
+                            placeholder="새 폴더 이름..."
+                            autocomplete="off"
+                        >
+                        <button class="folder-create-btn" id="createFolderBtn">생성</button>
+                    </div>
+                    <div id="foldersList" class="folders-list">
+                        <!-- 폴더 목록이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- 우측 메인 영역 -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2 id="currentViewTitle">오늘</h2>
+                <div class="header-actions">
+                    <span id="todoCount" class="todo-count">0개의 할일</span>
+                </div>
+            </div>
+            
+            <div class="content-body">
+                <!-- 필터 섹션 -->
+                <div class="filter-section">
+                    <button class="filter-btn active" data-filter="all">전체</button>
+                    <button class="filter-btn" data-filter="active">진행중</button>
+                    <button class="filter-btn" data-filter="completed">완료</button>
+                </div>
+                
+                <!-- 할일 리스트 -->
+                <ul id="todoList" class="todo-list">
+                    <!-- 할일 항목들이 여기에 동적으로 추가됩니다 -->
+                </ul>
+            </div>
+            
+            <!-- 할일 입력 섹션 (하단 고정) -->
+            <div class="input-section-bottom">
+                <div class="input-section">
+                    <input 
+                        type="text" 
+                        id="todoInput" 
+                        placeholder="할일 추가하기..." 
+                        autocomplete="off"
+                    >
+                    <div class="input-actions">
+                        <div class="folder-select-wrapper">
+                            <select id="folderSelect" class="folder-select">
+                                <option value="" disabled selected>폴더 선택</option>
+                                <option value="__new__">+ 새 폴더 생성</option>
+                            </select>
+                            <div id="newFolderInputWrapper" class="new-folder-input-wrapper" style="display: none;">
+                                <input 
+                                    type="text" 
+                                    id="newFolderInput" 
+                                    placeholder="폴더 이름 입력..."
+                                    autocomplete="off"
+                                >
+                                <button id="createFolderFromTodoBtn" class="create-folder-btn">생성</button>
+                            </div>
+                        </div>
+                        <button id="addBtn" class="add-btn" disabled>작업 추가</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 폴더 추가 모달 -->
+    <div id="folderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>새 폴더</h3>
+                <button class="modal-close" id="closeFolderModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input 
+                    type="text" 
+                    id="folderNameInput" 
+                    placeholder="폴더 이름을 입력하세요..."
+                    autocomplete="off"
+                >
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelFolderBtn">취소</button>
+                <button class="btn-primary" id="createFolderBtn">생성</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="script.js"></script>
+</body>
+</html>
+

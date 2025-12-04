@@ -1,0 +1,942 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* 좌측 사이드바 */
+.sidebar {
+    width: 260px;
+    background: #2d2d2d;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #3d3d3d;
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid #3d3d3d;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 0;
+}
+
+.nav-section {
+    margin-bottom: 24px;
+}
+
+.nav-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.section-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.add-folder-btn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.add-folder-btn:hover {
+    background: #3d3d3d;
+    color: #fff;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: #fff;
+    font-size: 15px;
+}
+
+.nav-item:hover {
+    background: #3d3d3d;
+}
+
+.nav-item.active {
+    background: #3d3d3d;
+    color: #fff;
+    border-left: 3px solid #dc4c3f;
+}
+
+.nav-icon {
+    margin-right: 12px;
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+.nav-text {
+    flex: 1;
+}
+
+.folders-list {
+    padding: 0;
+}
+
+#folderCreateInputWrapper {
+    padding: 8px 20px;
+    margin-bottom: 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#folderCreateInputWrapper #folderCreateInput {
+    flex: 1;
+    padding: 8px 12px;
+    background: #3d3d3d;
+    border: 1px solid #dc4c3f;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+#folderCreateInputWrapper #folderCreateInput::placeholder {
+    color: #9ca3af;
+}
+
+#folderCreateInputWrapper #folderCreateInput:focus {
+    border-color: #dc4c3f;
+    background: #4d4d4d;
+}
+
+.folder-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: #fff;
+    font-size: 15px;
+    position: relative;
+}
+
+.folder-item:hover {
+    background: #3d3d3d;
+}
+
+.folder-item-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.folder-more-btn {
+    display: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.folder-item:hover .folder-more-btn {
+    display: flex;
+}
+
+.folder-more-btn:hover {
+    background: #4d4d4d;
+    color: #fff;
+}
+
+.folder-item.active {
+    background: #3d3d3d;
+    color: #fff;
+    border-left: 3px solid #dc4c3f;
+}
+
+.folder-dropdown {
+    display: none;
+    background: #353535;
+    border-top: 1px solid #3d3d3d;
+    padding: 12px 20px 12px 60px;
+}
+
+.folder-dropdown.show {
+    display: block;
+}
+
+.folder-create-input-wrapper {
+    margin-bottom: 8px;
+    display: flex;
+    gap: 8px;
+}
+
+.folder-create-input {
+    flex: 1;
+    padding: 8px 12px;
+    background: #3d3d3d;
+    border: 1px solid #4d4d4d;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+.folder-create-input:focus {
+    border-color: #dc4c3f;
+}
+
+.folder-create-input::placeholder {
+    color: #9ca3af;
+}
+
+.folder-create-btn {
+    padding: 8px 16px;
+    background: #dc4c3f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.folder-create-btn:hover {
+    background: #c23d30;
+}
+
+.folder-item-content::before {
+    content: "📁";
+    margin-right: 12px;
+    font-size: 16px;
+    width: 20px;
+    display: inline-block;
+    text-align: center;
+}
+
+.folder-item.active .folder-item-content::before {
+    content: "📂";
+}
+
+.folder-popover {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 8px;
+    background: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    min-width: 120px;
+    padding: 4px 0;
+    margin-top: 4px;
+}
+
+.folder-popover.show {
+    display: block;
+    animation: popoverSlideIn 0.2s ease-out;
+}
+
+@keyframes popoverSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.popover-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: left;
+    gap: 8px;
+}
+
+.popover-item:hover {
+    background: #3d3d3d;
+}
+
+.popover-item-danger {
+    color: #ef4444;
+}
+
+.popover-item-danger:hover {
+    background: #3d3d3d;
+    color: #dc2626;
+}
+
+.popover-icon {
+    font-size: 14px;
+    width: 16px;
+    text-align: center;
+}
+
+/* 우측 메인 영역 */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+    overflow: hidden;
+}
+
+.content-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid #3d3d3d;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1e1e1e;
+}
+
+.content-header h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.todo-count {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.content-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px;
+    background: #1e1e1e;
+}
+
+/* 입력 섹션 (하단 고정) */
+.input-section-bottom {
+    position: sticky;
+    bottom: 0;
+    padding: 16px 32px;
+    background: #1e1e1e;
+    border-top: 1px solid #3d3d3d;
+    z-index: 10;
+}
+
+.input-section {
+    background: transparent;
+    border: 1px solid #4d4d4d;
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: border-color 0.2s;
+}
+
+.input-section:focus-within {
+    border-color: #dc4c3f;
+}
+
+#todoInput {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 8px 0;
+    margin-bottom: 0;
+    color: #fff;
+    background: transparent;
+}
+
+#todoInput::placeholder {
+    color: #9ca3af;
+}
+
+.input-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.folder-select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #3d3d3d;
+    color: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.folder-select option:disabled {
+    color: #9ca3af;
+}
+
+.folder-select option:not(:disabled) {
+    color: #fff;
+    background: #2d2d2d;
+}
+
+.folder-select:focus {
+    border-color: #dc4c3f;
+}
+
+.folder-select-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.new-folder-input-wrapper {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+}
+
+#newFolderInput {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #3d3d3d;
+    color: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#newFolderInput::placeholder {
+    color: #9ca3af;
+}
+
+#newFolderInput:focus {
+    border-color: #dc4c3f;
+}
+
+.create-folder-btn {
+    padding: 8px 16px;
+    background: #dc4c3f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.create-folder-btn:hover {
+    background: #c23d30;
+}
+
+.add-btn {
+    padding: 10px 20px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: not-allowed;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.add-btn:not(:disabled) {
+    background: #dc4c3f;
+    cursor: pointer;
+}
+
+.add-btn:not(:disabled):hover {
+    background: #c23d30;
+}
+
+.add-btn:disabled {
+    opacity: 0.7;
+}
+
+/* 필터 섹션 */
+.filter-section {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.filter-btn {
+    padding: 6px 16px;
+    background: transparent;
+    border: 1px solid #3d3d3d;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #9ca3af;
+}
+
+.filter-btn:hover {
+    background: #2d2d2d;
+    border-color: #4d4d4d;
+}
+
+.filter-btn.active {
+    background: #dc4c3f;
+    color: white;
+    border-color: #dc4c3f;
+}
+
+/* 할일 리스트 */
+.todo-list {
+    list-style: none;
+}
+
+.todo-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px;
+    background: transparent;
+    border-bottom: 1px solid #3d3d3d;
+    border-radius: 0;
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+}
+
+.todo-item:last-child {
+    border-bottom: none;
+}
+
+.todo-item:hover {
+    background: transparent;
+}
+
+.todo-item.completed {
+    opacity: 0.6;
+    background: transparent;
+}
+
+.todo-item.completed .todo-text {
+    text-decoration: line-through;
+    color: #6b7280;
+}
+
+.todo-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 16px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: 2px solid #6b7280;
+    border-radius: 50%;
+    background: transparent;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.todo-checkbox:hover {
+    border-color: #9ca3af;
+}
+
+.todo-checkbox:checked {
+    border-color: #dc4c3f;
+    background: #dc4c3f;
+}
+
+.todo-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+}
+
+.todo-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 100%;
+    position: relative;
+}
+
+.todo-text {
+    flex: 1;
+    font-size: 15px;
+    color: #fff;
+    word-break: break-word;
+    margin-bottom: 8px;
+}
+
+.todo-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.todo-date {
+    font-size: 0.8125rem;
+    color: #dc4c3f;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.todo-date::before {
+    content: "📅";
+    font-size: 12px;
+    margin-right: 4px;
+}
+
+.todo-text.editing {
+    padding: 6px 12px;
+    border: 2px solid #dc4c3f;
+    border-radius: 6px;
+    background: #3d3d3d;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    width: 100%;
+}
+
+.todo-folder {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+.todo-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.todo-item:hover .todo-actions {
+    opacity: 1;
+}
+
+.edit-btn, .delete-btn, .save-btn, .cancel-btn {
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    position: relative;
+    text-indent: -9999px;
+    overflow: hidden;
+}
+
+.edit-btn::after {
+    content: "✏️";
+    font-size: 16px;
+    text-indent: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.edit-btn:hover {
+    background: #3d3d3d;
+}
+
+.delete-btn::after {
+    content: "🗑️";
+    font-size: 16px;
+    text-indent: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.delete-btn:hover {
+    background: #3d3d3d;
+}
+
+.save-btn {
+    background: #10b981;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #059669;
+}
+
+.cancel-btn {
+    background: #6b7280;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #4b5563;
+}
+
+.edit-btn:disabled,
+.delete-btn:disabled,
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+}
+
+.empty-state-text {
+    color: #9ca3af;
+}
+
+.empty-state::before {
+    content: "📋";
+    display: block;
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state-text {
+    font-size: 16px;
+}
+
+/* 모달 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    animation: modalSlideIn 0.2s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+#folderNameInput {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#folderNameInput:focus {
+    border-color: #e91e63;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 20px 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn-cancel, .btn-primary {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.btn-cancel:hover {
+    background: #e5e7eb;
+}
+
+.btn-primary {
+    background: #dc4c3f;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #c23d30;
+}
+
+/* 스크롤바 스타일 */
+.sidebar-nav::-webkit-scrollbar,
+.content-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track,
+.content-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: #3d3d3d;
+    border-radius: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: #4d4d4d;
+}
+
+.content-body::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+}
+
+.content-body::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
