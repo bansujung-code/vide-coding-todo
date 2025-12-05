@@ -8,10 +8,21 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- 모바일 메뉴 버튼 -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="메뉴">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <!-- 사이드바 오버레이 (모바일) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
         <!-- 좌측 사이드바 -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h1 class="logo">Todoist</h1>
+                <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="닫기">×</button>
             </div>
             
             <nav class="sidebar-nav">
