@@ -112,6 +112,9 @@ body {
     padding: 8px 20px;
     margin-bottom: 8px;
     position: relative;
+    min-height: 36px;
+    line-height: 1.5;
+    box-sizing: border-box;
 }
 
 .section-title {
@@ -126,6 +129,8 @@ body {
 .add-folder-btn {
     width: 20px;
     height: 20px;
+    min-width: 20px;
+    min-height: 20px;
     border: none;
     background: transparent;
     color: var(--text-primary);
@@ -136,6 +141,7 @@ body {
     justify-content: center;
     border-radius: 4px;
     transition: all 0.2s;
+    flex-shrink: 0;
 }
 
 .add-folder-btn:hover {
@@ -151,6 +157,10 @@ body {
     transition: background 0.2s, color 0.3s;
     color: var(--text-primary);
     font-size: 15px;
+    border-left: 3px solid transparent;
+    box-sizing: border-box;
+    min-height: 40px;
+    line-height: 1.5;
 }
 
 .nav-item:hover {
@@ -218,6 +228,10 @@ body {
     color: var(--text-primary);
     font-size: 15px;
     position: relative;
+    border-left: 3px solid transparent;
+    box-sizing: border-box;
+    min-height: 40px;
+    line-height: 1.5;
 }
 
 .folder-item:hover {
@@ -260,6 +274,7 @@ body {
     background: var(--bg-tertiary);
     color: var(--text-primary);
     border-left: 3px solid var(--accent-color);
+    box-sizing: border-box;
 }
 
 .folder-dropdown {
@@ -1151,6 +1166,18 @@ body {
     .content-header h2 {
         font-size: 24px;
     }
+    
+    .nav-item {
+        min-height: 40px;
+    }
+    
+    .folder-item {
+        min-height: 40px;
+    }
+    
+    .nav-section-header {
+        min-height: 36px;
+    }
 }
 
 /* 모바일 (768px 이하) */
@@ -1266,10 +1293,16 @@ body {
     
     .nav-item {
         padding: 12px 20px;
+        min-height: 44px;
     }
     
     .folder-item {
         padding: 10px 20px;
+        min-height: 44px;
+    }
+    
+    .nav-section-header {
+        min-height: 40px;
     }
 }
 
@@ -1333,5 +1366,17 @@ body {
     
     .todo-count {
         font-size: 12px;
+    }
+    
+    .nav-item {
+        min-height: 40px;
+    }
+    
+    .folder-item {
+        min-height: 40px;
+    }
+    
+    .nav-section-header {
+        min-height: 36px;
     }
 }
