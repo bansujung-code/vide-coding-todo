@@ -88,6 +88,11 @@ body {
     color: var(--text-primary);
     letter-spacing: -0.5px;
     transition: color 0.3s;
+    cursor: pointer;
+}
+
+.logo:hover {
+    opacity: 0.8;
 }
 
 .sidebar-nav {
@@ -628,10 +633,17 @@ body {
 /* 필터 섹션 */
 .filter-section {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     margin-bottom: 24px;
     padding-bottom: 0;
     border-bottom: none;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 8px;
 }
 
 .filter-btn {
@@ -1081,7 +1093,7 @@ body {
     align-items: center;
     gap: 5px;
     padding: 8px;
-    transition: background 0.2s;
+    transition: background 0.2s, opacity 0.3s;
 }
 
 .mobile-menu-btn:hover {
@@ -1153,6 +1165,10 @@ body {
     
     .mobile-menu-btn {
         display: flex;
+    }
+    
+    .app-container:has(.sidebar.active) .mobile-menu-btn {
+        display: none !important;
     }
     
     .sidebar {
@@ -1228,11 +1244,19 @@ body {
     
     .filter-section {
         flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .filter-buttons {
         gap: 6px;
     }
     
     .filter-btn {
         padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .todo-count {
         font-size: 13px;
     }
     
@@ -1304,6 +1328,10 @@ body {
     
     .filter-btn {
         padding: 5px 10px;
+        font-size: 12px;
+    }
+    
+    .todo-count {
         font-size: 12px;
     }
 }

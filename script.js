@@ -1085,12 +1085,20 @@ function initMobileMenu() {
         sidebar.classList.add('active');
         sidebarOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        // 모바일 메뉴 버튼 숨기기
+        if (mobileMenuBtn) {
+            mobileMenuBtn.style.display = 'none';
+        }
     }
     
     function closeSidebar() {
         sidebar.classList.remove('active');
         sidebarOverlay.classList.remove('active');
         document.body.style.overflow = '';
+        // 모바일 메뉴 버튼 다시 보이기
+        if (mobileMenuBtn && window.innerWidth <= 768) {
+            mobileMenuBtn.style.display = 'flex';
+        }
     }
     
     if (mobileMenuBtn) {
@@ -1119,13 +1127,47 @@ function initMobileMenu() {
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
             closeSidebar();
+        } else {
+            // 모바일로 돌아왔을 때 사이드바가 닫혀있으면 메뉴 버튼 표시
+            if (!sidebar.classList.contains('active') && mobileMenuBtn) {
+                mobileMenuBtn.style.display = 'flex';
+            }
         }
     });
+}
+
+// 로고 클릭 시 첫 화면으로 이동
+function initLogoClick() {
+    const logo = document.getElementById('logo');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    
+    if (logo) {
+        logo.addEventListener('click', () => {
+            selectView('today');
+            // 모바일에서 사이드바가 열려있으면 닫기
+            if (window.innerWidth <= 768) {
+                if (sidebar && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    if (sidebarOverlay) {
+                        sidebarOverlay.classList.remove('active');
+                    }
+                    document.body.style.overflow = '';
+                    // 모바일 메뉴 버튼 다시 보이기
+                    if (mobileMenuBtn) {
+                        mobileMenuBtn.style.display = 'flex';
+                    }
+                }
+            }
+        });
+    }
 }
 
 // 초기화
 initTheme();
 initMobileMenu();
+initLogoClick();
 loadFolders();
 loadTodos();
 
