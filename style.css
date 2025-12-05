@@ -1,3 +1,27 @@
+:root {
+    /* 다크 모드 (기본) */
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #3d3d3d;
+    --text-primary: #fff;
+    --text-secondary: #9ca3af;
+    --border-color: #3d3d3d;
+    --accent-color: #dc4c3f;
+    --accent-hover: #c23d30;
+}
+
+[data-theme="light"] {
+    /* 라이트 모드 */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #e5e5e5;
+    --text-primary: #1e1e1e;
+    --text-secondary: #6b7280;
+    --border-color: #e5e5e5;
+    --accent-color: #dc4c3f;
+    --accent-hover: #c23d30;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,10 +30,11 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f5f5f5;
-    color: #333;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     height: 100vh;
     overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .app-container {
@@ -21,23 +46,26 @@ body {
 /* 좌측 사이드바 */
 .sidebar {
     width: 260px;
-    background: #2d2d2d;
-    color: #fff;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     display: flex;
     flex-direction: column;
-    border-right: 1px solid #3d3d3d;
+    border-right: 1px solid var(--border-color);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 .sidebar-header {
     padding: 20px;
-    border-bottom: 1px solid #3d3d3d;
+    border-bottom: 1px solid var(--border-color);
+    transition: border-color 0.3s;
 }
 
 .logo {
     font-size: 24px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-primary);
     letter-spacing: -0.5px;
+    transition: color 0.3s;
 }
 
 .sidebar-nav {
@@ -62,9 +90,10 @@ body {
 .section-title {
     font-size: 12px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    transition: color 0.3s;
 }
 
 .add-folder-btn {
@@ -72,7 +101,7 @@ body {
     height: 20px;
     border: none;
     background: transparent;
-    color: #fff;
+    color: var(--text-primary);
     font-size: 18px;
     cursor: pointer;
     display: flex;
@@ -83,8 +112,8 @@ body {
 }
 
 .add-folder-btn:hover {
-    background: #3d3d3d;
-    color: #fff;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
 .nav-item {
@@ -92,19 +121,19 @@ body {
     align-items: center;
     padding: 10px 20px;
     cursor: pointer;
-    transition: background 0.2s;
-    color: #fff;
+    transition: background 0.2s, color 0.3s;
+    color: var(--text-primary);
     font-size: 15px;
 }
 
 .nav-item:hover {
-    background: #3d3d3d;
+    background: var(--bg-tertiary);
 }
 
 .nav-item.active {
-    background: #3d3d3d;
-    color: #fff;
-    border-left: 3px solid #dc4c3f;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-left: 3px solid var(--accent-color);
 }
 
 .nav-icon {
@@ -134,21 +163,22 @@ body {
 #folderCreateInputWrapper #folderCreateInput {
     flex: 1;
     padding: 8px 12px;
-    background: #3d3d3d;
-    border: 1px solid #dc4c3f;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--accent-color);
     border-radius: 4px;
-    color: #fff;
+    color: var(--text-primary);
     font-size: 14px;
     outline: none;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 #folderCreateInputWrapper #folderCreateInput::placeholder {
-    color: #9ca3af;
+    color: var(--text-secondary);
 }
 
 #folderCreateInputWrapper #folderCreateInput:focus {
-    border-color: #dc4c3f;
-    background: #4d4d4d;
+    border-color: var(--accent-color);
+    background: var(--bg-tertiary);
 }
 
 .folder-item {
@@ -157,14 +187,14 @@ body {
     justify-content: space-between;
     padding: 8px 20px;
     cursor: pointer;
-    transition: background 0.2s;
-    color: #fff;
+    transition: background 0.2s, color 0.3s;
+    color: var(--text-primary);
     font-size: 15px;
     position: relative;
 }
 
 .folder-item:hover {
-    background: #3d3d3d;
+    background: var(--bg-tertiary);
 }
 
 .folder-item-content {
@@ -180,7 +210,7 @@ body {
     padding: 0;
     border: none;
     background: transparent;
-    color: #9ca3af;
+    color: var(--text-secondary);
     font-size: 18px;
     cursor: pointer;
     border-radius: 4px;
@@ -195,14 +225,14 @@ body {
 }
 
 .folder-more-btn:hover {
-    background: #4d4d4d;
-    color: #fff;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
 .folder-item.active {
-    background: #3d3d3d;
-    color: #fff;
-    border-left: 3px solid #dc4c3f;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-left: 3px solid var(--accent-color);
 }
 
 .folder-dropdown {
@@ -225,20 +255,21 @@ body {
 .folder-create-input {
     flex: 1;
     padding: 8px 12px;
-    background: #3d3d3d;
-    border: 1px solid #4d4d4d;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    color: #fff;
+    color: var(--text-primary);
     font-size: 14px;
     outline: none;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 .folder-create-input:focus {
-    border-color: #dc4c3f;
+    border-color: var(--accent-color);
 }
 
 .folder-create-input::placeholder {
-    color: #9ca3af;
+    color: var(--text-secondary);
 }
 
 .folder-create-btn {
@@ -276,14 +307,15 @@ body {
     position: absolute;
     top: 100%;
     right: 8px;
-    background: #2d2d2d;
-    border: 1px solid #3d3d3d;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     z-index: 100;
     min-width: 120px;
     padding: 4px 0;
     margin-top: 4px;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .folder-popover.show {
@@ -309,16 +341,16 @@ body {
     padding: 8px 16px;
     border: none;
     background: transparent;
-    color: #fff;
+    color: var(--text-primary);
     font-size: 14px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.3s;
     text-align: left;
     gap: 8px;
 }
 
 .popover-item:hover {
-    background: #3d3d3d;
+    background: var(--bg-tertiary);
 }
 
 .popover-item-danger {
@@ -341,23 +373,26 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: #1e1e1e;
+    background: var(--bg-primary);
     overflow: hidden;
+    transition: background-color 0.3s;
 }
 
 .content-header {
     padding: 24px 32px;
-    border-bottom: 1px solid #3d3d3d;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #1e1e1e;
+    background: var(--bg-primary);
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .content-header h2 {
     font-size: 28px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-primary);
+    transition: color 0.3s;
 }
 
 .header-actions {
@@ -366,16 +401,54 @@ body {
     gap: 16px;
 }
 
+.theme-toggle-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+[data-theme="light"] .theme-toggle-btn {
+    background: #f0f0f0;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--border-color);
+    transform: scale(1.05);
+}
+
+[data-theme="light"] .theme-toggle-btn:hover {
+    background: #e0e0e0;
+}
+
+.theme-icon {
+    font-size: 20px;
+    line-height: 1;
+    transition: transform 0.3s;
+}
+
+.theme-toggle-btn:hover .theme-icon {
+    transform: rotate(15deg);
+}
+
 .todo-count {
     font-size: 14px;
-    color: #9ca3af;
+    color: var(--text-secondary);
 }
 
 .content-body {
     flex: 1;
     overflow-y: auto;
     padding: 24px 32px;
-    background: #1e1e1e;
+    background: var(--bg-primary);
+    transition: background-color 0.3s;
 }
 
 /* 입력 섹션 (하단 고정) */
@@ -383,21 +456,22 @@ body {
     position: sticky;
     bottom: 0;
     padding: 16px 32px;
-    background: #1e1e1e;
-    border-top: 1px solid #3d3d3d;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
     z-index: 10;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .input-section {
     background: transparent;
-    border: 1px solid #4d4d4d;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 12px 16px;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, border-color 0.3s;
 }
 
 .input-section:focus-within {
-    border-color: #dc4c3f;
+    border-color: var(--accent-color);
 }
 
 #todoInput {
@@ -407,12 +481,13 @@ body {
     font-size: 16px;
     padding: 8px 0;
     margin-bottom: 0;
-    color: #fff;
+    color: var(--text-primary);
     background: transparent;
+    transition: color 0.3s;
 }
 
 #todoInput::placeholder {
-    color: #9ca3af;
+    color: var(--text-secondary);
 }
 
 .input-actions {
@@ -425,27 +500,31 @@ body {
 .folder-select {
     flex: 1;
     padding: 8px 12px;
-    border: 1px solid #3d3d3d;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     font-size: 14px;
-    background: #3d3d3d;
-    color: #fff;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
     cursor: pointer;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, background-color 0.3s, color 0.3s;
+}
+
+[data-theme="light"] .folder-select {
+    background: hsl(0, 0%, 96%);
 }
 
 .folder-select option:disabled {
-    color: #9ca3af;
+    color: var(--text-secondary);
 }
 
 .folder-select option:not(:disabled) {
-    color: #fff;
-    background: #2d2d2d;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
 }
 
 .folder-select:focus {
-    border-color: #dc4c3f;
+    border-color: var(--accent-color);
 }
 
 .folder-select-wrapper {
@@ -462,21 +541,21 @@ body {
 #newFolderInput {
     flex: 1;
     padding: 8px 12px;
-    border: 1px solid #3d3d3d;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     font-size: 14px;
-    background: #3d3d3d;
-    color: #fff;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, background-color 0.3s, color 0.3s;
 }
 
 #newFolderInput::placeholder {
-    color: #9ca3af;
+    color: var(--text-secondary);
 }
 
 #newFolderInput:focus {
-    border-color: #dc4c3f;
+    border-color: var(--accent-color);
 }
 
 .create-folder-btn {
@@ -507,6 +586,10 @@ body {
     white-space: nowrap;
 }
 
+[data-theme="light"] .add-btn {
+    background: hsl(215, 13%, 63%);
+}
+
 .add-btn:not(:disabled) {
     background: #dc4c3f;
     cursor: pointer;
@@ -532,23 +615,23 @@ body {
 .filter-btn {
     padding: 6px 16px;
     background: transparent;
-    border: 1px solid #3d3d3d;
+    border: 1px solid var(--border-color);
     border-radius: 20px;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.2s;
-    color: #9ca3af;
+    transition: all 0.2s, background-color 0.3s, color 0.3s, border-color 0.3s;
+    color: var(--text-secondary);
 }
 
 .filter-btn:hover {
-    background: #2d2d2d;
-    border-color: #4d4d4d;
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
 }
 
 .filter-btn.active {
-    background: #dc4c3f;
+    background: var(--accent-color);
     color: white;
-    border-color: #dc4c3f;
+    border-color: var(--accent-color);
 }
 
 /* 할일 리스트 */
@@ -561,9 +644,9 @@ body {
     align-items: flex-start;
     padding: 16px;
     background: transparent;
-    border-bottom: 1px solid #3d3d3d;
+    border-bottom: 1px solid var(--border-color);
     border-radius: 0;
-    transition: all 0.2s;
+    transition: all 0.2s, border-color 0.3s;
     cursor: pointer;
     position: relative;
 }
@@ -590,7 +673,7 @@ body {
 
 .todo-item.completed .todo-text {
     text-decoration: line-through;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .todo-checkbox {
@@ -601,22 +684,22 @@ body {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    border: 2px solid #6b7280;
+    border: 2px solid var(--text-secondary);
     border-radius: 50%;
     background: transparent;
     position: absolute;
     left: 16px;
     top: 16px;
-    transition: all 0.2s;
+    transition: all 0.2s, border-color 0.3s;
 }
 
 .todo-checkbox:hover {
-    border-color: #9ca3af;
+    border-color: var(--text-secondary);
 }
 
 .todo-checkbox:checked {
-    border-color: #dc4c3f;
-    background: #dc4c3f;
+    border-color: var(--accent-color);
+    background: var(--accent-color);
 }
 
 .todo-checkbox:checked::after {
@@ -643,9 +726,10 @@ body {
 .todo-text {
     flex: 1;
     font-size: 15px;
-    color: #fff;
+    color: var(--text-primary);
     word-break: break-word;
     margin-bottom: 8px;
+    transition: color 0.3s;
 }
 
 .todo-meta {
@@ -671,22 +755,24 @@ body {
 
 .todo-text.editing {
     padding: 6px 12px;
-    border: 2px solid #dc4c3f;
+    border: 2px solid var(--accent-color);
     border-radius: 6px;
-    background: #3d3d3d;
-    color: #fff;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
     font-size: 15px;
     outline: none;
     width: 100%;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 .todo-folder {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
     background: transparent;
     padding: 0;
     border-radius: 0;
     margin-right: 16px;
+    transition: color 0.3s;
 }
 
 .todo-actions {
@@ -711,9 +797,9 @@ body {
     border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s, background-color 0.3s, color 0.3s;
     background: transparent;
-    color: #9ca3af;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -735,7 +821,7 @@ body {
 }
 
 .edit-btn:hover {
-    background: #3d3d3d;
+    background: var(--bg-tertiary);
 }
 
 .delete-btn::after {
@@ -749,7 +835,7 @@ body {
 }
 
 .delete-btn:hover {
-    background: #3d3d3d;
+    background: var(--bg-tertiary);
 }
 
 .save-btn {

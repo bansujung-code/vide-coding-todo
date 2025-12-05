@@ -1046,7 +1046,36 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// 테마 전환 기능
+function initTheme() {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle?.querySelector('.theme-icon');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+    // 저장된 테마 적용
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(themeIcon, savedTheme);
+    
+    // 테마 전환 버튼 클릭 이벤트
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(themeIcon, newTheme);
+        });
+    }
+}
+
+function updateThemeIcon(icon, theme) {
+    if (!icon) return;
+    icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
 // 초기화
+initTheme();
 loadFolders();
 loadTodos();
 
