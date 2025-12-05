@@ -1127,6 +1127,10 @@ function initMobileMenu() {
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
             closeSidebar();
+            // PC 사이즈에서는 모바일 메뉴 버튼 숨기기
+            if (mobileMenuBtn) {
+                mobileMenuBtn.style.display = 'none';
+            }
         } else {
             // 모바일로 돌아왔을 때 사이드바가 닫혀있으면 메뉴 버튼 표시
             if (!sidebar.classList.contains('active') && mobileMenuBtn) {
@@ -1164,10 +1168,23 @@ function initLogoClick() {
     }
 }
 
+// 초기 로드 시 화면 크기에 따라 모바일 메뉴 버튼 표시/숨김
+function initMobileMenuButton() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    if (mobileMenuBtn) {
+        if (window.innerWidth > 768) {
+            mobileMenuBtn.style.display = 'none';
+        } else {
+            mobileMenuBtn.style.display = 'flex';
+        }
+    }
+}
+
 // 초기화
 initTheme();
 initMobileMenu();
 initLogoClick();
+initMobileMenuButton();
 loadFolders();
 loadTodos();
 
