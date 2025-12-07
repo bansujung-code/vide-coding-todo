@@ -1,34 +1,50 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-import { 
-    getDatabase, 
-    ref, 
-    push, 
-    set, 
-    onValue, 
-    remove, 
-    update,
-    query,
-    orderByChild
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+// 백엔드 API 기본 URL
+const API_BASE_URL = 'http://localhost:5000';
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyD2kWGBjVoLDEGQ5e6GnUoJKfwUTDHI_yA",
-    authDomain: "sujung-todo-be.firebaseapp.com",
-    projectId: "sujung-todo-be",
-    storageBucket: "sujung-todo-be.firebasestorage.app",
-    messagingSenderId: "604912810144",
-    appId: "1:604912810144:web:75ea36372a3f38f461f1c5",
-    measurementId: "G-5LSQFF1VPP",
-    databaseURL: "https://sujung-todo-be-default-rtdb.firebaseio.com/"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getDatabase(app);
+// 백엔드 API 호출 함수들
+async function apiRequest(endpoint, method = 'GET', body = null) {
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    };
+    
+    if (body) {
+        options.body = JSON.stringify(body);
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+        
+        // 응답이 JSON인지 확인
+        const contentType = response.headers.get('content-type');
+        let data;
+        
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            // JSON이 아닌 경우 텍스트로 읽기
+            const text = await response.text();
+            throw new Error(`서버 응답 형식 오류: ${text || `HTTP ${response.status}`}`);
+        }
+        
+        if (!response.ok) {
+            // 백엔드 에러 응답 형식: { error: '에러 메시지' } 또는 { error: '에러 메시지', details: '상세 정보' }
+            const errorMessage = data.error || data.message || `HTTP error! status: ${response.status}`;
+            throw new Error(errorMessage);
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('API 요청 실패:', error);
+        // 네트워크 에러인 경우
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            throw new Error('서버에 연결할 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
+        }
+        throw error;
+    }
+}
 
 // 할일 데이터 저장소
 let todos = [];
@@ -59,35 +75,36 @@ const cancelFolderBtn = document.getElementById('cancelFolderBtn');
 const closeFolderModal = document.getElementById('closeFolderModal');
 const currentViewTitle = document.getElementById('currentViewTitle');
 
-// 폴더 불러오기 (Firebase Realtime Database)
+// 폴더 불러오기 (로컬 스토리지)
 function loadFolders() {
-    const foldersRef = ref(db, 'folders');
-    
-    onValue(foldersRef, (snapshot) => {
-        folders = [];
-        const data = snapshot.val();
+    try {
+        const storedFolders = localStorage.getItem('folders');
+        folders = storedFolders ? JSON.parse(storedFolders) : [];
         
-        if (data) {
-            Object.keys(data).forEach((key) => {
-                folders.push({
-                    id: key,
-                    ...data[key]
-                });
-            });
-            
-            // 생성 시간 기준으로 정렬
-            folders.sort((a, b) => {
-                const timeA = new Date(a.createdAt || 0).getTime();
-                const timeB = new Date(b.createdAt || 0).getTime();
-                return timeB - timeA;
-            });
-        }
+        // 생성 시간 기준으로 정렬
+        folders.sort((a, b) => {
+            const timeA = new Date(a.createdAt || 0).getTime();
+            const timeB = new Date(b.createdAt || 0).getTime();
+            return timeB - timeA;
+        });
         
         renderFolders();
         updateFolderSelect();
-    }, (error) => {
+    } catch (error) {
         console.error('폴더를 불러오는 중 오류 발생:', error);
-    });
+        folders = [];
+        renderFolders();
+        updateFolderSelect();
+    }
+}
+
+// 폴더 저장 (로컬 스토리지)
+function saveFolders() {
+    try {
+        localStorage.setItem('folders', JSON.stringify(folders));
+    } catch (error) {
+        console.error('폴더 저장 중 오류 발생:', error);
+    }
 }
 
 // 폴더 목록 렌더링
@@ -128,7 +145,7 @@ function renderFolders() {
 }
 
 // nav-section-header에서 폴더 생성
-async function createFolderFromHeader() {
+function createFolderFromHeader() {
     const input = document.getElementById('folderCreateInput');
     if (!input) return;
     
@@ -146,19 +163,29 @@ async function createFolderFromHeader() {
     
     try {
         const newFolder = {
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
             name: name,
             createdAt: new Date().toISOString()
         };
         
-        const foldersRef = ref(db, 'folders');
-        const newFolderRef = push(foldersRef);
-        await set(newFolderRef, newFolder);
+        folders.push(newFolder);
+        saveFolders();
         
-        console.log('폴더가 생성되었습니다. ID:', newFolderRef.key);
+        console.log('폴더가 생성되었습니다. ID:', newFolder.id);
         
         // 입력 필드 초기화 및 숨김
         input.value = '';
         document.getElementById('folderCreateInputWrapper').style.display = 'none';
+        
+        renderFolders();
+        // 드롭다운 업데이트 시 새로 생성된 폴더를 선택하도록 전달
+        updateFolderSelect(newFolder.id);
+        
+        // 할일 추가 버튼 활성화 상태 업데이트
+        const hasText = todoInput.value.trim().length > 0;
+        if (currentView === 'today') {
+            addBtn.disabled = !hasText;
+        }
     } catch (error) {
         console.error('폴더 생성 중 오류 발생:', error);
         alert('폴더를 생성하는 중 오류가 발생했습니다: ' + error.message);
@@ -166,7 +193,10 @@ async function createFolderFromHeader() {
 }
 
 // 폴더 선택 드롭다운 업데이트
-function updateFolderSelect() {
+function updateFolderSelect(selectedFolderId = null) {
+    // 현재 선택된 값 보존
+    const currentValue = selectedFolderId !== null ? selectedFolderId : folderSelect.value;
+    
     folderSelect.innerHTML = '<option value="" disabled selected>폴더 선택</option><option value="__new__">+ 새 폴더 생성</option>';
     folders.forEach(folder => {
         const option = document.createElement('option');
@@ -174,10 +204,15 @@ function updateFolderSelect() {
         option.textContent = folder.name;
         folderSelect.appendChild(option);
     });
+    
+    // 이전에 선택된 값 복원 (유효한 경우)
+    if (currentValue && currentValue !== '' && currentValue !== '__new__') {
+        folderSelect.value = currentValue;
+    }
 }
 
 // 폴더 생성
-async function createFolder() {
+function createFolder() {
     const name = folderNameInput.value.trim();
     if (name === '') {
         alert('폴더 이름을 입력해주세요!');
@@ -192,18 +227,28 @@ async function createFolder() {
     
     try {
         const newFolder = {
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
             name: name,
             createdAt: new Date().toISOString()
         };
         
-        const foldersRef = ref(db, 'folders');
-        const newFolderRef = push(foldersRef);
-        await set(newFolderRef, newFolder);
+        folders.push(newFolder);
+        saveFolders();
         
-        console.log('폴더가 생성되었습니다. ID:', newFolderRef.key);
+        console.log('폴더가 생성되었습니다. ID:', newFolder.id);
         
         // 모달 닫기
         closeFolderModalFunc();
+        
+        renderFolders();
+        // 드롭다운 업데이트 시 새로 생성된 폴더를 선택하도록 전달
+        updateFolderSelect(newFolder.id);
+        
+        // 할일 추가 버튼 활성화 상태 업데이트
+        const hasText = todoInput.value.trim().length > 0;
+        if (currentView === 'today') {
+            addBtn.disabled = !hasText;
+        }
     } catch (error) {
         console.error('폴더 생성 중 오류 발생:', error);
         alert('폴더를 생성하는 중 오류가 발생했습니다: ' + error.message);
@@ -255,15 +300,18 @@ function editFolder(folderId) {
     updateFolder(folderId, trimmedName);
 }
 
-// Firebase에서 폴더 수정
-async function updateFolder(folderId, newName) {
+// 폴더 수정 (로컬 스토리지)
+function updateFolder(folderId, newName) {
     try {
-        const folderRef = ref(db, `folders/${folderId}`);
-        await update(folderRef, {
-            name: newName,
-            updatedAt: new Date().toISOString()
-        });
-        console.log('폴더가 수정되었습니다. ID:', folderId);
+        const folder = folders.find(f => f.id === folderId);
+        if (folder) {
+            folder.name = newName;
+            folder.updatedAt = new Date().toISOString();
+            saveFolders();
+            renderFolders();
+            updateFolderSelect();
+            console.log('폴더가 수정되었습니다. ID:', folderId);
+        }
     } catch (error) {
         console.error('폴더 수정 중 오류 발생:', error);
         alert('폴더를 수정하는 중 오류가 발생했습니다: ' + error.message);
@@ -282,7 +330,13 @@ async function deleteFolder(folderId) {
     }
     
     // 해당 폴더의 할일 개수 확인
-    const folderTodos = todos.filter(todo => todo.folderId === folderId);
+    const folderTodos = todos.filter(todo => {
+        let todoFolderId = todo.folderId;
+        if (!todoFolderId && todo.description && todo.description.startsWith('folderId:')) {
+            todoFolderId = todo.description.replace('folderId:', '');
+        }
+        return todoFolderId === folderId;
+    });
     const todoCount = folderTodos.length;
     
     let confirmMessage = `"${folder.name}" 폴더를 삭제하시겠습니까?`;
@@ -295,18 +349,18 @@ async function deleteFolder(folderId) {
     }
     
     try {
-        // 폴더 삭제
-        const folderRef = ref(db, `folders/${folderId}`);
-        await remove(folderRef);
-        
-        // 해당 폴더의 할일도 삭제
+        // 해당 폴더의 할일도 삭제 (백엔드 API 호출)
         if (todoCount > 0) {
             const deletePromises = folderTodos.map(todo => {
-                const todoRef = ref(db, `todos/${todo.id}`);
-                return remove(todoRef);
+                const todoId = todo._id || todo.id;
+                return apiRequest(`/todos/${todoId}`, 'DELETE');
             });
             await Promise.all(deletePromises);
         }
+        
+        // 폴더 삭제 (로컬 스토리지)
+        folders = folders.filter(f => f.id !== folderId);
+        saveFolders();
         
         console.log('폴더가 삭제되었습니다. ID:', folderId);
         
@@ -314,6 +368,9 @@ async function deleteFolder(folderId) {
         if (currentFolderId === folderId) {
             selectView('today');
         }
+        
+        renderFolders();
+        updateFolderSelect();
     } catch (error) {
         console.error('폴더 삭제 중 오류 발생:', error);
         alert('폴더를 삭제하는 중 오류가 발생했습니다: ' + error.message);
@@ -401,37 +458,69 @@ function closeFolderModalFunc() {
     folderNameInput.value = '';
 }
 
-// Realtime Database에서 할일 불러오기 (실시간 업데이트)
-function loadTodos() {
-    const todosRef = ref(db, 'todos');
-    
-    // 실시간으로 데이터 변경 감지
-    onValue(todosRef, (snapshot) => {
-        todos = [];
-        const data = snapshot.val();
+// 완료 상태를 로컬 스토리지에서 불러오기
+function loadCompletedStates() {
+    try {
+        const stored = localStorage.getItem('todoCompletedStates');
+        return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+        console.error('완료 상태 불러오기 실패:', error);
+        return {};
+    }
+}
+
+// 완료 상태를 로컬 스토리지에 저장하기
+function saveCompletedStates() {
+    try {
+        const states = {};
+        todos.forEach(todo => {
+            const todoId = todo._id || todo.id;
+            if (todo.completed !== undefined) {
+                states[todoId] = todo.completed;
+            }
+        });
+        localStorage.setItem('todoCompletedStates', JSON.stringify(states));
+    } catch (error) {
+        console.error('완료 상태 저장 실패:', error);
+    }
+}
+
+// 백엔드 API에서 할일 불러오기
+async function loadTodos() {
+    try {
+        const data = await apiRequest('/todos', 'GET');
         
-        if (data) {
-            // 객체를 배열로 변환
-            Object.keys(data).forEach((key) => {
-                todos.push({
-                    id: key,
-                    ...data[key]
-                });
-            });
+        // 백엔드에서 이미 배열로 반환되므로 그대로 사용
+        todos = Array.isArray(data) ? data : [];
+        
+        // 로컬 스토리지에서 완료 상태 복원
+        const completedStates = loadCompletedStates();
+        todos.forEach(todo => {
+            const todoId = todo._id || todo.id;
+            // 백엔드에는 completed 필드가 없으므로 로컬 스토리지에서 복원
+            todo.completed = completedStates[todoId] || false;
             
-            // 생성 시간 기준으로 정렬 (최신순)
-            todos.sort((a, b) => {
-                const timeA = new Date(a.createdAt || 0).getTime();
-                const timeB = new Date(b.createdAt || 0).getTime();
-                return timeB - timeA;
-            });
-        }
+            // 호환성을 위해 text 필드 추가
+            todo.text = todo.title;
+            
+            // description에서 folderId 추출
+            if (todo.description && todo.description.startsWith('folderId:')) {
+                todo.folderId = todo.description.replace('folderId:', '');
+            }
+        });
+        
+        // 생성 시간 기준으로 정렬 (최신순) - 백엔드에서 이미 정렬되어 있지만 안전을 위해
+        todos.sort((a, b) => {
+            const timeA = new Date(a.createdAt || 0).getTime();
+            const timeB = new Date(b.createdAt || 0).getTime();
+            return timeB - timeA;
+        });
         
         renderTodos();
-    }, (error) => {
+    } catch (error) {
         console.error('할일을 불러오는 중 오류 발생:', error);
         alert('할일을 불러오는 중 오류가 발생했습니다: ' + error.message);
-    });
+    }
 }
 
 // 할일 추가 (Firebase Realtime Database 사용)
@@ -480,16 +569,24 @@ async function addTodo() {
         // 폴더 생성
         try {
             const newFolder = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
                 name: newFolderName,
                 createdAt: new Date().toISOString()
             };
             
-            const foldersRef = ref(db, 'folders');
-            const newFolderRef = push(foldersRef);
-            await set(newFolderRef, newFolder);
+            folders.push(newFolder);
+            saveFolders();
             
-            selectedFolderId = newFolderRef.key;
+            selectedFolderId = newFolder.id;
             console.log('폴더가 생성되었습니다. ID:', selectedFolderId);
+            
+            // 새 폴더 입력 필드 숨기기 및 초기화
+            newFolderInputWrapper.style.display = 'none';
+            newFolderInput.value = '';
+            
+            renderFolders();
+            // 드롭다운 업데이트 시 새로 생성된 폴더를 선택하도록 전달
+            updateFolderSelect(selectedFolderId);
         } catch (error) {
             console.error('폴더 생성 중 오류 발생:', error);
             alert('폴더를 생성하는 중 오류가 발생했습니다: ' + error.message);
@@ -502,7 +599,6 @@ async function addTodo() {
     addBtn.textContent = '추가 중...';
     
     try {
-        // Realtime Database에 새 할일 추가
         // 폴더 ID가 유효한지 확인 (null이거나 '__new__'가 아니어야 함)
         const finalFolderId = selectedFolderId && selectedFolderId !== '__new__' ? selectedFolderId : null;
         
@@ -515,20 +611,22 @@ async function addTodo() {
             return;
         }
         
-        const newTodo = {
-            text: text,
-            completed: false,
-            folderId: finalFolderId,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
+        // 백엔드 API에 새 할일 추가
+        // 백엔드 API는 title과 description을 받음
+        const newTodo = await apiRequest('/todos', 'POST', {
+            title: text,
+            description: finalFolderId ? `folderId:${finalFolderId}` : '' // 폴더 정보를 description에 임시 저장
+        });
         
-        // Realtime Database의 'todos' 경로에 새 항목 추가
-        const todosRef = ref(db, 'todos');
-        const newTodoRef = push(todosRef);
-        await set(newTodoRef, newTodo);
+        // 로컬에서 폴더 정보 추가 (백엔드에는 저장되지 않지만 UI를 위해)
+        newTodo.folderId = finalFolderId;
+        newTodo.text = newTodo.title; // 기존 코드와 호환성을 위해 text 필드 추가
+        newTodo.completed = false;
         
-        console.log('할일이 추가되었습니다. ID:', newTodoRef.key);
+        // 새 할일의 완료 상태를 로컬 스토리지에 저장
+        saveCompletedStates();
+        
+        console.log('할일이 추가되었습니다. ID:', newTodo._id || newTodo.id);
         
         // 입력 필드 초기화
         todoInput.value = '';
@@ -555,6 +653,9 @@ async function addTodo() {
         } else {
             addBtn.disabled = true;
         }
+        
+        // 할일 목록 다시 불러오기
+        await loadTodos();
     } catch (error) {
         console.error('할일 추가 중 오류 발생:', error);
         alert('할일을 추가하는 중 오류가 발생했습니다: ' + error.message);
@@ -572,7 +673,7 @@ async function deleteTodo(id) {
     }
     
     // 삭제할 항목 찾기
-    const todo = todos.find(t => t.id === id);
+    const todo = todos.find(t => (t._id || t.id) === id);
     if (!todo) {
         alert('삭제할 할일을 찾을 수 없습니다.');
         return;
@@ -586,10 +687,12 @@ async function deleteTodo(id) {
     }
     
     try {
-        // Firebase Realtime Database에서 할일 삭제
-        const todoRef = ref(db, `todos/${id}`);
-        await remove(todoRef);
+        // 백엔드 API에서 할일 삭제
+        await apiRequest(`/todos/${id}`, 'DELETE');
         console.log('할일이 삭제되었습니다. ID:', id);
+        
+        // 할일 목록 다시 불러오기
+        await loadTodos();
     } catch (error) {
         console.error('할일 삭제 중 오류 발생:', error);
         alert('할일을 삭제하는 중 오류가 발생했습니다: ' + error.message);
@@ -604,15 +707,19 @@ async function deleteTodo(id) {
 
 // 할일 완료 상태 토글
 async function toggleTodo(id) {
-    const todo = todos.find(t => t.id === id);
+    const todo = todos.find(t => (t._id || t.id) === id);
     if (!todo) return;
     
     try {
-        const todoRef = ref(db, `todos/${id}`);
-        await update(todoRef, {
-            completed: !todo.completed,
-            updatedAt: new Date().toISOString()
-        });
+        // 백엔드 API는 title과 description만 받지만, 완료 상태는 로컬에서만 관리
+        // 로컬 상태만 업데이트 (백엔드에는 completed 필드가 없으므로)
+        todo.completed = !todo.completed;
+        
+        // 로컬 스토리지에 완료 상태 저장
+        saveCompletedStates();
+        
+        renderTodos();
+        
         console.log('할일 상태가 변경되었습니다. ID:', id);
     } catch (error) {
         console.error('할일 상태 변경 중 오류 발생:', error);
@@ -622,7 +729,7 @@ async function toggleTodo(id) {
 
 // 할일 수정 모드 진입
 function editTodo(id) {
-    const todo = todos.find(t => t.id === id);
+    const todo = todos.find(t => (t._id || t.id) === id);
     if (!todo) {
         alert('수정할 할일을 찾을 수 없습니다.');
         return;
@@ -646,7 +753,7 @@ function editTodo(id) {
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'todo-text editing';
-    input.value = todo.text;
+    input.value = todo.title || todo.text;
     
     // 버튼 변경
     const saveBtn = document.createElement('button');
@@ -678,7 +785,7 @@ function editTodo(id) {
     });
 }
 
-// 할일 수정 저장 (Firebase Realtime Database 사용)
+// 할일 수정 저장 (백엔드 API 사용)
 async function saveEdit(id, newText) {
     const text = newText.trim();
     if (text === '') {
@@ -687,14 +794,15 @@ async function saveEdit(id, newText) {
     }
     
     // 수정할 항목 찾기
-    const todo = todos.find(t => t.id === id);
+    const todo = todos.find(t => (t._id || t.id) === id);
     if (!todo) {
         alert('수정할 할일을 찾을 수 없습니다.');
         return;
     }
     
     // 같은 내용이면 수정하지 않음
-    if (todo.text === text) {
+    const currentText = todo.title || todo.text;
+    if (currentText === text) {
         cancelEdit(id);
         return;
     }
@@ -707,13 +815,22 @@ async function saveEdit(id, newText) {
     }
     
     try {
-        // Firebase Realtime Database에서 할일 수정
-        const todoRef = ref(db, `todos/${id}`);
-        await update(todoRef, {
-            text: text,
-            updatedAt: new Date().toISOString()
+        // 백엔드 API에서 할일 수정
+        const todo = todos.find(t => (t._id || t.id) === id);
+        if (!todo) {
+            alert('수정할 할일을 찾을 수 없습니다.');
+            return;
+        }
+        
+        const updatedTodo = await apiRequest(`/todos/${id}`, 'PUT', {
+            title: text,
+            description: todo.description || ''
         });
+        
         console.log('할일이 수정되었습니다. ID:', id, '새 내용:', text);
+        
+        // 할일 목록 다시 불러오기
+        await loadTodos();
     } catch (error) {
         console.error('할일 수정 중 오류 발생:', error);
         alert('할일을 수정하는 중 오류가 발생했습니다: ' + error.message);
@@ -757,7 +874,14 @@ function getFilteredTodos() {
         filtered = todos;
     } else if (currentView === 'folder' && currentFolderId) {
         // 선택된 폴더의 할일만 표시
-        filtered = todos.filter(todo => todo.folderId === currentFolderId);
+        filtered = todos.filter(todo => {
+            // folderId가 직접 있거나 description에서 추출
+            let folderId = todo.folderId;
+            if (!folderId && todo.description && todo.description.startsWith('folderId:')) {
+                folderId = todo.description.replace('folderId:', '');
+            }
+            return folderId === currentFolderId;
+        });
     }
     
     // 상태별 필터링
@@ -779,26 +903,39 @@ function renderTodos() {
         todoList.innerHTML = '<li class="empty-state"><div class="empty-state-text">할일이 없습니다</div></li>';
     } else {
         todoList.innerHTML = filteredTodos.map(todo => {
-            const folder = todo.folderId ? folders.find(f => f.id === todo.folderId) : null;
+            // 백엔드에서 받은 데이터 형식에 맞게 처리
+            const todoId = todo._id || todo.id;
+            const todoText = todo.title || todo.text;
+            const todoDescription = todo.description || '';
+            
+            // description에서 folderId 추출 (임시로 저장한 경우)
+            let folderId = todo.folderId;
+            if (!folderId && todoDescription && todoDescription.startsWith('folderId:')) {
+                folderId = todoDescription.replace('folderId:', '');
+            }
+            
+            const folder = folderId ? folders.find(f => f.id === folderId) : null;
             const date = todo.createdAt ? formatDate(todo.createdAt) : '';
+            const isCompleted = todo.completed !== undefined ? todo.completed : false;
+            
             return `
-            <li class="todo-item ${todo.completed ? 'completed' : ''}" data-id="${todo.id}">
+            <li class="todo-item ${isCompleted ? 'completed' : ''}" data-id="${todoId}">
                 <input 
                     type="checkbox" 
                     class="todo-checkbox" 
-                    ${todo.completed ? 'checked' : ''}
-                    onchange="toggleTodo('${todo.id}')"
+                    ${isCompleted ? 'checked' : ''}
+                    onchange="toggleTodo('${todoId}')"
                 >
                 <div class="todo-content">
-                    <span class="todo-text">${escapeHtml(todo.text)}</span>
+                    <span class="todo-text">${escapeHtml(todoText)}</span>
                     <div class="todo-meta">
                         ${date ? `<div class="todo-date">${date}</div>` : '<div></div>'}
                         ${folder ? `<span class="todo-folder">${escapeHtml(folder.name)}</span>` : ''}
                     </div>
                 </div>
                 <div class="todo-actions">
-                    <button class="edit-btn" onclick="editTodo('${todo.id}')" title="수정"></button>
-                    <button class="delete-btn" onclick="deleteTodo('${todo.id}')" title="삭제"></button>
+                    <button class="edit-btn" onclick="editTodo('${todoId}')" title="수정"></button>
+                    <button class="delete-btn" onclick="deleteTodo('${todoId}')" title="삭제"></button>
                 </div>
             </li>
         `;
@@ -890,7 +1027,7 @@ newFolderInput.addEventListener('keypress', (e) => {
 });
 
 // 폴더 생성 버튼 (할일 생성 섹션)
-createFolderFromTodoBtn.addEventListener('click', async () => {
+createFolderFromTodoBtn.addEventListener('click', () => {
     const name = newFolderInput.value.trim();
     if (name === '') {
         alert('폴더 이름을 입력해주세요!');
@@ -905,20 +1042,34 @@ createFolderFromTodoBtn.addEventListener('click', async () => {
     
     try {
         const newFolder = {
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
             name: name,
             createdAt: new Date().toISOString()
         };
         
-        const foldersRef = ref(db, 'folders');
-        const newFolderRef = push(foldersRef);
-        await set(newFolderRef, newFolder);
+        folders.push(newFolder);
+        saveFolders();
         
-        console.log('폴더가 생성되었습니다. ID:', newFolderRef.key);
+        console.log('폴더가 생성되었습니다. ID:', newFolder.id);
         
-        // 드롭다운에서 새로 생성된 폴더 선택
-        folderSelect.value = newFolderRef.key;
+        // 새 폴더 입력 필드 숨기기 및 초기화
         newFolderInputWrapper.style.display = 'none';
         newFolderInput.value = '';
+        
+        renderFolders();
+        // 드롭다운 업데이트 시 새로 생성된 폴더를 선택하도록 전달
+        updateFolderSelect(newFolder.id);
+        
+        // 할일 추가 버튼 활성화 상태 업데이트
+        const hasText = todoInput.value.trim().length > 0;
+        if (currentView === 'today') {
+            addBtn.disabled = !hasText; // 폴더가 선택되었으므로 텍스트만 확인
+        } else {
+            addBtn.disabled = !hasText;
+        }
+        
+        // 할일 입력 필드에 포커스 이동
+        todoInput.focus();
     } catch (error) {
         console.error('폴더 생성 중 오류 발생:', error);
         alert('폴더를 생성하는 중 오류가 발생했습니다: ' + error.message);
